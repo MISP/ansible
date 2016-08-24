@@ -26,5 +26,5 @@
     prompt: "Enter the mysql misp user password"  
     private: yes
   - name: enable_auto_backup
-    prompt: "Do you want to enable automatic backup everyday ? (y/n)"  
+    prompt: "Do you want to enable automatic backup everyday ? (y/n)"
     private: no
