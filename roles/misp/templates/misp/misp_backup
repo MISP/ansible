@@ -5,13 +5,13 @@
 ###########################################
 
 TIMESTAMP=`date +%m%d%Y%H%M`
-BACKUP_PATH='/opt/misp-server/backup'
+BACKUP_PATH='{{data_location}}/backup'
 BACKUP_DIR="$BACKUP_PATH/$TIMESTAMP"
 
 BACKUP_MYSQL_DIR="$BACKUP_DIR/mysql"
 BACKUP_FILES_DIR="$BACKUP_DIR/misp"
 
-MISP_FILES="/opt/misp-server/misp/app/files"
+MISP_FILES="{{data_location}}/files"
 MISP_CONF="/opt/misp-server/misp/app/Config"
 
 mkdir "$BACKUP_DIR"

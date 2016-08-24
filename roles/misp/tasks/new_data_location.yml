@@ -1,0 +1,115 @@
+############################################
+#####        NEW DATA LOCATION          ####
+############################################
+
+- name: Create MISP backup and data directories
+  file:
+    path: "{{ item }}"
+    owner: misp
+    group: misp-server
+    mode: 0775
+    state: directory
+  with_items:
+    - "{{data_location}}/backup"
+
+######### MOVE MYSQL DATA #########
+
+- name: MySQL | Stop service to move data
+  service:
+    name: mysql
+    state: stopped
+    enabled: yes
+  when: mysql_init.changed
+
+- name: MySQL | Copy data
+  shell: "{{ item }}"
+  with_items:
+    - "cp -R -p /var/lib/mysql {{data_location}} "
+  sudo: yes
+  when: mysql_init.changed
+
+- name: MySQL | Update MySQL configuration
+  replace:
+    dest: /etc/mysql/my.cnf
+    regexp: '/var/lib/mysql'
+    replace: '{{data_location}}/mysql'
+  when: mysql_init.changed
+
+- name: MySQL | Update AppArmor configuration
+  replace:
+    dest: /etc/apparmor.d/usr.sbin.mysqld
+    regexp: '/var/lib/mysql/'
+    replace: '{{data_location}}/mysql/'
+  when: mysql_init.changed
+
+- name: MySQL | Reload service AppArmor
+  service:
+    name: apparmor
+    state: reloaded
+    enabled: yes
+  when: mysql_init.changed
+
+- name: MySQL | Start service after moving data
+  service:
+    name: mysql
+    state: restarted
+    enabled: yes
+  when: mysql_init.changed
+
+- name: MySQL | Check if old data directory is removed
+  file:
+    path: /var/lib/mysql
+    state: absent
+  sudo: yes
+
+#### MISP DATA MOVE ####
+
+# Copy with SHELL since Ansible does not currently support recursive remote copying
+- name: Copy tmp data
+  shell: "{{ item }}"
+  with_items:
+    - "cp -rp /opt/misp-server/misp/app/tmp {{data_location}}/ "
+  sudo: yes
+  when: mysql_init.changed
+
+- name: Remove old MISP tmp data directory
+  file:
+    path: /opt/misp-server/misp/app/tmp
+    state: absent
+  sudo: yes
+  when: mysql_init.changed
+
+- name: Link MISP tmp data directory to new data location
+  file:
+    src: "{{data_location}}/tmp"
+    dest: /opt/misp-server/misp/app/tmp
+    state: link
+    force: yes
+    owner: misp
+    group: misp-server
+    mode: 777
+
+# Copy with SHELL since Ansible does not currently support recursive remote copying
+- name: Copy MISP file data directory to /DATA
+  shell: "{{ item }}"
+  with_items:
+    - "cp -rp /opt/misp-server/misp/app/files {{data_location}}/ "
+  sudo: yes
+  when: mysql_init.changed
+
+- name: Remove old MISP files data directory
+  file:
+    path: /opt/misp-server/misp/app/files
+    state: absent
+  sudo: yes
+  when: mysql_init.changed
+
+- name: Link MISP file data directory to /DATA
+  file:
+    src: "{{data_location}}/files"
+    dest: /opt/misp-server/misp/app/files
+    state: link
+    force: yes
+    owner: misp
+    group: misp-server
+    mode: 777

@@ -1,2 +1,3 @@
 ---
 # default lower priority variables for this role
+data_location: /opt/misp-server/misp/app

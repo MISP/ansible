@@ -72,7 +72,6 @@
     - "/opt/misp-server"
     - "/opt/misp-server/misp"
     - "/opt/misp-server/tmp"
-    - "/opt/misp-server/backup"
 
 ######### PEAR: CRYPTPGP #########
 - name: Configure PEAR proxy
@@ -317,7 +316,7 @@
   with_items:
     - mysql -D misp < /opt/misp-server/misp/INSTALL/MYSQL.sql
   when: mysql_init.changed
-  
+
 ######### PERMISSIONS #########
 
 - name: Fix all files permissions
@@ -327,38 +326,14 @@
     state: directory
     mode: "g=u"
 
-############################################
-#####           BACKUP                  ####
-############################################
+############ BACKUP ###########
 
-- name: Copy backup script
-  become: true
-  template: 
-    src: misp/{{item}}
-    dest: /bin/{{item}}
-    mode: 0755
-  with_items:
-    - misp_backup
+- name: Configure and enable MISP backup
+  include: backup.yml
   when: enable_auto_backup == 'y'
 
-- name: Copy restore script
-  template: 
-    src: misp/{{item}}
-    dest: /opt/misp-server/backup/{{item}}
-    mode: 0755
-    owner: misp
-    group: misp
-  with_items:
-    - misp_backup
-  when: enable_auto_backup == 'y'
+####### NEW DATA LOCATION #####
 
-- name: Create backup cronjob
-  become: true
-  become_user: misp
-  cron:
-    name: "misp backup cronjob"
-    minute: "0"
-    hour: "4"
-    job: "sh /bin/misp_backup"
-  when: enable_auto_backup == 'y'
-
+- name: Change DATA location of MISP
+  include: new_data_location.yml
+  when: data_location != '/opt/misp-server/misp/app'

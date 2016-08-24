@@ -1,0 +1,41 @@
+############################################
+#####           BACKUP                  ####
+############################################
+
+- name: Create MISP server directory
+  file:
+    path: "{{ item }}"
+    owner: misp
+    group: misp-server
+    mode: 02775
+    state: directory
+  with_items: 
+    - "{{data_location}}/backup"
+
+- name: Copy backup script
+  become: true
+  template:
+    src: misp/{{item}}
+    dest: /bin/{{item}}
+    mode: 0755
+  with_items:
+    - misp_backup
+
+- name: Copy restore script
+  template:
+    src: misp/{{item}}
+    dest: "{{data_location}}/backup/{{item}}"
+    mode: 0755
+    owner: misp
+    group: misp
+  with_items:
+    - misp_restore
+
+- name: Create backup cronjob
+  become: true
+  become_user: misp
+  cron:
+    name: "misp backup cronjob"
+    minute: "0"
+    hour: "4"
+    job: "sh /bin/misp_backup"
