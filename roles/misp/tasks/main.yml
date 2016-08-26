@@ -326,14 +326,20 @@
     state: directory
     mode: "g=u"
 
-############ BACKUP ###########
+#######       BACKUP      #######
 
 - name: Configure and enable MISP backup
   include: backup.yml
   when: enable_auto_backup == 'y'
 
-####### NEW DATA LOCATION #####
+####### NEW DATA LOCATION #######
 
 - name: Change DATA location of MISP
   include: new_data_location.yml
   when: data_location != '/opt/misp-server/misp/app'
+
+#######   MISP-MODULES    #######
+
+- name: Install misp-modules
+  include: modules.yml
+  when: install_modules == 'y'

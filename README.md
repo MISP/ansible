@@ -1,6 +1,10 @@
 MISP - Ansible installation script
 ----------------------------------------
 
+- V0.2
+  * Data location management
+  * misp-modules installation
+
 - V0.1
   * Nginx support only
   * Backup script provided
@@ -11,6 +15,12 @@ Instructions
 
 ```bash
 ansible-playbook -i <host>, misp.yml -k -K -u <user>
+```
+
+- If you want to move the MISP data location to <path> (MySQL database, MISP files and tmp), add the following parameter to ansible-playbook:
+
+```bash
+--extra-vars "data_location=<path>"
 ```
 
 - Update the self-signed certificate in /etc/nginx/ssl
