@@ -252,6 +252,17 @@
     insertbefore: "exit 0"
     line: "su misp -c 'bash /opt/misp-server/misp/app/Console/worker/start.sh'"
 
+- name: MISP app and its tmp directories permissions
+  file:
+    path: "{{ item }}"
+    owner: misp
+    group: misp-server
+    mode: 02775
+    state: directory
+  with_items: 
+    - "/opt/misp-server/misp/app"
+    - "/opt/misp-server/misp/app/tmp"
+
 ######### ADD-ON #########
 
 - name: Install ZeroMQ
