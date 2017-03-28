@@ -250,7 +250,7 @@
     state: present
     dest: /etc/rc.local
     insertbefore: "exit 0"
-    line: "sudo -u www-data bash /opt/misp-server/misp/app/Console/worker/start.sh"
+    line: "su misp -c 'bash /opt/misp-server/misp/app/Console/worker/start.sh'"
 
 ######### ADD-ON #########
 
