@@ -104,7 +104,6 @@
     recursive: yes
     force: no
     update: no
-    version: v2.4.49
     accept_hostkey: yes
 
 - name: Configure Git
@@ -132,7 +131,6 @@
     dest: "/opt/misp-server/misp/app/files/scripts/python-cybox"
     force: no
     update: no
-    version: v2.1.0.12
     accept_hostkey: yes
 
 - name: Clone MISP depedencies | Python-Stix
@@ -143,7 +141,6 @@
     dest: "/opt/misp-server/misp/app/files/scripts/python-stix"
     force: no
     update: no
-    version: v1.1.1.4
     accept_hostkey: yes
 
 - name: Install MISP depedencies | Python-Cybox
