@@ -2,7 +2,7 @@
 
 - name: mysql-server - installation
   apt:
-    pkg: mysql-server-5.6
+    pkg: mysql-server
     state: present
 
 - name: python-mysqldb - installation
